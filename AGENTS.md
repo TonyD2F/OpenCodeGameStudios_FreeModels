@@ -1,264 +1,116 @@
-# OpenCode Game Studios
+# OpenCode Game Studios — Zen Edition
 
-Indie game development managed through 52 coordinated OpenCode agents.
-Each agent owns a specific domain, enforcing separation of concerns and quality.
+Indie game development managed through coordinated OpenCode agents.  
+**This fork is locked to free OpenCode Zen models only.**
+
+> Models rotate frequently. Run `node utils/zen-model-updater.mjs` regularly (or via cron / GitHub Action) to stay current.
 
 ## Technology Stack
 
-- **Engine**: [CHOOSE: Godot 4 / Unity / Unreal Engine 5 / SFML 3 / Raylib / Bevy]
-- **Language**: [CHOOSE: GDScript / C# / C++ / Blueprint / C / C++17]
-- **Build System**: [SPECIFY after choosing engine]
-- **Asset Pipeline**: [SPECIFY after choosing engine]
+- **Engine**: [CHOOSE: Godot 4 / Unity / Unreal Engine 5 / SFML 3 / Raylib / Bevy / Canvas-WebView]
+- **Language**: [CHOOSE: GDScript / C# / C++ / Blueprint / C / TypeScript]
+- **Target**: Offline Android arcade preferred (APK export or pure WebView)
+- **Models**: Free OpenCode Zen only (auto-updated)
 
-> **Note**: Engine-specialist agents exist for Godot, Unity, Unreal, SFML 3,
-> Raylib, and Bevy. Use the set matching your engine.
+## Model Policy (Zen-only)
+
+All agents use free Zen models. The updater script selects the best currently available free models into three tiers:
+
+| Tier | Purpose | Preferred free models (auto-selected) |
+|------|---------|---------------------------------------|
+| **Directors** | Strategic planning, architecture, cross-team | glm-5.3-flash-free → deepseek-v4.1-flash-free → flint-40b-free → big-pickle |
+| **Workhorses** | Implementation, design, testing, review | deepseek-v4.1-flash-free → glm-5.3-flash-free → nemotron-3.5-lightning-free → big-pickle |
+| **Light** | Simple / always-on agents | beam-free → jev-1.13-free → nemotron-3.5-lightning-free → big-pickle |
+
+Run the updater:
+
+```bash
+node utils/zen-model-updater.mjs          # apply
+node utils/zen-model-updater.mjs --dry-run
+```
 
 ## Project Structure
 
 ```text
 /
-├── AGENTS.md                    # Project configuration
-├── opencode.json                # OpenCode config (permissions, plugins)
-├── .pi/                         # Pi settings and extensions
-├── .agents/                     # Canonical content (harness-agnostic)
-│   ├── agents/                  # 52 agent definitions
-│   ├── skills/                  # 77 skill workflows
-│   ├── commands/                # 77 slash commands
-│   ├── rules/                   # 11 path-scoped coding standards
-│   └── modules/                 # 22 installable modules
-├── .opencode/                   # OpenCode-specific
-│   ├── plugins/                 # TypeScript plugins (ccgs-hooks, drift-detector, changelog-generator)
-│   ├── agents/ → ../.agents/agents/   (symlink)
-│   ├── skills/ → ../.agents/skills/   (symlink)
-│   ├── commands/ → ../.agents/commands/ (symlink)
-│   └── rules/ → ../.agents/rules/     (symlink)
-├── .pi/                         # Pi-specific extensions & settings
-│   └── extensions/              # Pi extensions (ocgs-core, delegation, question, path-guard, etc.)
-├── docs/
-│   ├── architecture/            # Architecture Decision Records (ADRs)
-│   ├── engine-reference/        # Curated engine API snapshots (version-pinned)
-│   ├── framework/               # OCGS framework reference docs & templates
-│   │   ├── director-gates.md    # Quality gate definitions
-│   │   ├── technical-preferences.md  # Project tech config (populated by /setup-engine)
-│   │   ├── agent-roster.md      # Full agent inventory
-│   │   ├── coding-standards.md  # Code review standards
-│   │   ├── coordination-rules.md    # Agent coordination rules
-│   │   ├── templates/           # Document templates (GDDs, ADRs, specs, etc.)
-│   │   └── ...                  # Skills reference, workflow catalog, etc.
-│   ├── pi-compatibility.md      # Pi setup guide
-│   ├── pi-extensions.md         # Pi extension reference
-│   ├── pi-workflow.md           # Pi workflow differences
-│   ├── authoring-agents.md      # Agent creation guide
-│   ├── authoring-skills.md      # Skill creation guide
-│   ├── hybrid-workflow.md       # Hybrid workflow reference
-│   └── CONTRIBUTING.md          # Framework contribution guide
-├── tests/
-│   ├── agents/                  # Agent framework validation
-│   │   ├── validate.mjs         # Structural compliance checker
-│   │   ├── validate-gdscript.mjs # GDScript snippet linter
-│   │   └── validation-report.md # Latest audit results
-│   ├── extensions/              # Pi extension unit tests
-│   ├── e2e/                     # E2E parity tests
-│   └── [game-specific tests]
-├── src/                         # Game source code
-├── assets/                      # Game assets
-├── design/                      # Game design documents
-├── tools/                       # Build and pipeline tools
-│   ├── migrate-to-agents.mjs    # Migration script (.opencode/ → .agents/)
-│   └── ...
-├── prototypes/                  # Throwaway prototypes
-└── production/                  # Sprint plans, milestones, session logs
+├── AGENTS.md                    # This file
+├── opencode.json                # OpenCode config
+├── utils/
+│   ├── zen-model-updater.mjs    # ★ Automatic free-model updater
+│   └── .zen-models-cache.json   # Last known free models
+├── .agents/                     # Canonical content
+│   ├── agents/                  # Agent definitions (model fields auto-updated)
+│   ├── skills/                  # Skills (including visual-feedback + android-arcade)
+│   ├── commands/
+│   ├── rules/
+│   └── modules/
+├── design/
+├── prototypes/
+├── production/
+└── docs/
 ```
 
-## Modular Framework
+## Quality Rules (Zen Edition additions)
 
-The framework is partitioned into installable theme modules.
+1. **Visual + runtime feedback is mandatory**  
+   Before any story/task is marked complete the agent must produce:
+   - Successful build / export
+   - Console free of errors
+   - At least one screenshot (or short clip) of the running game
+   - FPS / delta-time sanity check when applicable
 
-**Core** (always installed): creative-director, technical-director, producer, /start, /help, /concept-brainstorm, /setup-engine, validation suite.
+2. **Android offline arcade path preferred**  
+   Prefer Godot 4 (export templates) or pure Canvas + WebView.  
+   Touch controls, localStorage / offline saves, no network required.
 
-**Available modules:** art, design, architecture, stories, programming, ui, audio, narrative, level-design, qa, release, prototyping, live-ops, localization, data, engine-godot, engine-unity, engine-unreal, engine-sfml3, engine-raylib, engine-bevy.
+3. **Stricter “done” definition**  
+   Mechanical checks before claiming completion. Soft claims are rejected.
 
-**Install:** `node .opencode/modules/install.mjs add <name>`
-**Remove:** `node .opencode/modules/install.mjs remove <name>`
-**List:** `node .opencode/modules/install.mjs list`
+4. **Arcade preset**  
+   Use `node .opencode/modules/install.mjs add arcade` (or the core + design + programming + qa + engine-godot set) for lightweight 2D offline games.
 
 ## Coordination Rules
 
-1. **Vertical Delegation**: Leadership agents delegate to department leads, who
-   delegate to specialists. Never skip a tier for complex decisions.
-2. **Horizontal Consultation**: Agents at the same tier may consult each other
-   but must not make binding decisions outside their domain.
-3. **Conflict Resolution**: When two agents disagree, escalate to the shared
-   parent. If no shared parent, escalate to `creative-director` for design
-   conflicts or `technical-director` for technical conflicts.
-4. **Change Propagation**: When a design change affects multiple domains, the
-   `producer` agent coordinates the propagation.
-5. **No Unilateral Cross-Domain Changes**: An agent must never modify files
-   outside its designated directories without explicit delegation.
+1. Vertical Delegation: Leadership → department leads → specialists.
+2. No unilateral cross-domain changes.
+3. File is the memory — update `production/session-state/active.md` after every significant step.
+4. User-driven collaboration: Question → Options → Decision → Draft → Approval.
 
-## Collaboration Protocol
+## Getting Started (Zen)
 
-**User-driven collaboration, not autonomous execution.**
-Every task follows: **Question -> Options -> Decision -> Draft -> Approval**
-
-- Agents MUST ask "May I write this to [filepath]?" before using Write/Edit tools
-- Agents MUST show drafts or summaries before requesting approval
-- Multi-file changes require explicit approval for the full changeset
-- No commits without user instruction
-
-## Coding Standards
-
-- All game code must include doc comments on public APIs
-- Every system must have a corresponding architecture decision record in `docs/architecture/`
-- Gameplay values must be data-driven (external config), never hardcoded
-- All public methods must be unit-testable (dependency injection over singletons)
-- Commits must reference the relevant design document or task ID
-- **Verification-driven development**: Write tests first when adding gameplay systems.
-  For UI changes, verify with screenshots. Compare expected output to actual output
-  before marking work complete. Every implementation should have a way to prove it works.
-
-## Context Management
-
-Context is the most critical resource in an OpenCode session. Manage it actively.
-
-**The file is the memory, not the conversation.** Conversations are ephemeral and
-will be compacted or lost. Files on disk persist across compactions and session crashes.
-
-Maintain `production/session-state/active.md` as a living checkpoint. Update it
-after each significant milestone:
-
-- Design section approved and written to file
-- Architecture decision made
-- Implementation milestone reached
-- Test results obtained
-
-The state file should contain: current task, progress checklist, key decisions
-made, files being worked on, and open questions.
-
-## Workflow Modes
-
-This project supports two workflow modes. Choose the one that fits your team size and project maturity:
-
-### Hybrid Workflow (Recommended for Indie Teams)
-
-- **Discovery Phase**: Rapid prototyping to find the fun. Low process overhead, minimal agents, throwaway code in `prototypes/`.
-- **Production Phase**: Full OCGS discipline once the design is proven. Formal GDDs, ADRs, tests, and quality gates.
-- **Best for**: Teams of 1–5, unknown designs, iterating to find the fun.
-- **See**: `docs/hybrid-workflow.md` for full details.
-
-### Full OCGS Workflow
-
-- **All phases formal**: Every feature goes through design → architecture → stories → code → tests → review.
-- **Best for**: Teams of 5–15, known designs, long timelines, publisher requirements.
-- **See**: Full documentation in `docs/` and `.agents/skills/`.
-
-## Getting Started
-
-### OpenCode
-
-Run `/start` in OpenCode to begin the guided onboarding flow.
-Or jump directly to:
-- `/concept-brainstorm` — explore game ideas from scratch
-- `/setup-engine godot 4.6` — configure your engine (also: unity, unreal, sfml3, raylib, bevy)
-- `/project-stage-detect` — analyze an existing project
-- `/prototype` — rapid prototype a concept
-- `/hybrid-prototype` — fast-lane prototype for discovery phase
-
-### Pi
-
-Start Pi from the project root:
 ```bash
-pi
+# 1. Make sure free models are current
+node utils/zen-model-updater.mjs
+
+# 2. Start OpenCode
+opencode
+
+# 3. Onboard
+/start
+# or
+/setup-engine godot 4
+/hybrid-prototype
 ```
 
-All OCGS skills, commands, and agents load automatically through the `.pi/extensions/` extensions.
+## Available High-Value Commands
 
-Pi-specific commands differ from OpenCode in a few cases:
-- Use `/generate-changelog` instead of `/changelog` (Pi has a built-in with that name)
+| Command | Purpose |
+|---------|---------|
+| `/start` | Guided onboarding |
+| `/setup-engine` | Configure engine (Godot recommended for Android) |
+| `/hybrid-prototype` | Fast discovery prototype |
+| `/visual-feedback` | Run + screenshot + fix loop |
+| `/android-arcade` | Offline APK / WebView packaging helpers |
+| `/smoke-check` | Build + console + visual evidence |
+| `/gate-check` | Phase gate with strict pass/fail |
 
-See [docs/pi-compatibility.md](docs/pi-compatibility.md) for the full Pi setup guide,
-[docs/pi-extensions.md](docs/pi-extensions.md) for the extension reference, and
-[docs/pi-workflow.md](docs/pi-workflow.md) for workflow differences.
+## Studio Hierarchy (same as upstream)
 
-### Key commands in both harnesses
+Tier 1 — Directors  
+Tier 2 — Department Leads  
+Tier 3 — Specialists + Engine specialists (Godot preferred for this fork)
 
-| Command | OpenCode | Pi |
-|---------|----------|----|
-| Delegation | `Task` tool (built-in) | `Task` tool (ocgs-delegation extension) |
-| Peer review | — | `/consult <agent>` (ocgs-delegation extension) |
-| Decision capture | question tool | question tool (ocgs-question with TUI) |
-| Skill invocation | `/command-name` | `/command-name` (via prompt templates) |
+---
 
-## Available Commands
-
-Type `/` in OpenCode to see all available commands. All 77 commands route to
-corresponding skills in `.agents/skills/`.
-
-| Category | Commands |
-|----------|----------|
-| **Onboarding** | `/start`, `/help`, `/project-stage-detect`, `/setup-engine`, `/init-template`, `/adopt` |
-| **Design** | `/concept-brainstorm`, `/map-systems`, `/design-system`, `/quick-design`, `/design-review`, `/review-all-gdds`, `/ux-design`, `/ux-review` |
-| **Architecture** | `/create-architecture`, `/architecture-decision`, `/architecture-review`, `/create-control-manifest` |
-| **Stories** | `/create-epics`, `/create-stories`, `/story-readiness`, `/dev-story`, `/story-done`, `/code-review` |
-| **QA** | `/qa-plan`, `/smoke-check`, `/soak-test`, `/regression-suite`, `/test-setup`, `/test-helpers`, `/test-evidence-review`, `/test-flakiness` |
-| **Prototyping** | `/prototype`, `/hybrid-prototype`, `/explore`, `/reverse-document` |
-| **Team** | `/team-combat`, `/team-narrative`, `/team-ui`, `/team-level`, `/team-audio`, `/team-polish`, `/team-qa`, `/team-release`, `/team-live-ops` |
-| **Release** | `/sprint-plan`, `/sprint-status`, `/milestone-review`, `/release-checklist`, `/launch-checklist`, `/retrospective` |
-| **Ops** | `/hotfix`, `/day-one-patch`, `/bug-report`, `/bug-triage`, `/security-audit` |
-| **Other** | `/balance-check`, `/consistency-check`, `/content-audit`, `/asset-audit`, `/perf-profile`, `/scope-check`, `/gate-check`, `/changelog`, `/patch-notes`, `/localize`, `/onboard`, `/tech-debt`, `/propagate-design-change`, `/estimate`, `/art-bible`, `/asset-spec`, `/art-generate`, `/playtest-report`, `/automated-smoke-test`, `/skill-improve`, `/skill-test` |
-
-## Studio Hierarchy
-
-```
-Tier 1 — Directors (Primary agents)
-  creative-director    technical-director    producer
-
-Tier 2 — Department Leads (Subagents)
-  game-designer        lead-programmer       art-director
-  audio-director       narrative-director    qa-lead
-  release-manager      localization-lead
-
-Tier 3 — Specialists (Subagents)
-  gameplay-programmer  engine-programmer     ai-programmer
-  network-programmer   tools-programmer      ui-programmer
-  systems-designer     level-designer        economy-designer
-  technical-artist     sound-designer        writer
-  world-builder        ux-designer           prototyper
-  performance-analyst  devops-engineer       analytics-engineer
-  security-engineer    qa-tester             accessibility-specialist
-  live-ops-designer    community-manager
-```
-
-## Engine Specialists
-
-- **Godot 4**: `godot-specialist` + `godot-gdscript-specialist`, `godot-csharp-specialist`, `godot-shader-specialist`, `godot-gdextension-specialist`
-- **Unity**: `unity-specialist` + `unity-dots-specialist`, `unity-shader-specialist`, `unity-addressables-specialist`, `unity-ui-specialist`
-- **Unreal Engine 5**: `unreal-specialist` + `ue-blueprint-specialist`, `ue-gas-specialist`, `ue-replication-specialist`, `ue-umg-specialist`
-- **SFML 3**: `sfml-specialist` (single agent — covers Graphics, Audio, Network, Window, System)
-- **Raylib**: `raylib-specialist` (single agent — covers core, rlgl, raudio, raymath, raygui)
-- **Bevy**: `bevy-specialist` (single agent — ECS, 2D/3D rendering, bevy_ui, assets, audio)
-
-## Quality Gates
-
-Before merging to `development`, the CI must pass:
-
-- **Agent validation** (`.github/workflows/agent-validation.yml`):
-  - All agent files have required frontmatter and sections
-  - All skill files have valid cross-references to existing agents
-  - All command files reference valid skill directories
-- **Plugin tests** (`npm run test:plugins`):
-  - 18 test suites, 158 tests covering all hooks
-
-## Notes
-
-This is a port of [Claude Code Game Studios](https://github.com/Donchitos/Claude-Code-Game-Studios)
-to OpenCode. The 77 skills are in `.agents/skills/`, the 52 agents are in
-`.agents/agents/`, and the 12 original bash hooks are implemented as a
-TypeScript plugin in `.opencode/plugins/ccgs-hooks.ts`.
-
-Additional plugins (`drift-detector.ts`, `changelog-generator.ts`) extend the
-framework beyond the original port. See `.opencode/plugins/README.md` for the
-plugin architecture guide.
-
-To contribute to the framework itself — adding agents, skills, commands, rules,
-or plugins — see `docs/CONTRIBUTING.md`.
+This is a production-ready Zen-locked fork of [striderZA/OpenCodeGameStudios](https://github.com/striderZA/OpenCodeGameStudios).  
+All model assignments are free-only and kept current by the automatic updater.
