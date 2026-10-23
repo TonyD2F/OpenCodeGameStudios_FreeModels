@@ -6,6 +6,17 @@
 
 ---
 
+## Recent Updates 
+10/23 -- Item -- Enforcement / Change Made
+
+• Default output path - Always write to design/specs/<project-slug>-spec.md
+
+• Source-of-truth header - Every spec must start with a one-line pointer back to design/game-definition.md
+
+• Post-delivery next step - Agent must end with a concrete suggestion (/create-stories, /hybrid-prototype, or /visual-feedback)
+
+• Session state update - Also update production/session-state/active.md with the new spec path + next step
+
 ## Why this fork?
 
 | Problem | Zen Edition solution |
