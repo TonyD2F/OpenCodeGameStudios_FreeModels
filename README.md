@@ -1,6 +1,6 @@
 # OpenCode Game Studios — Zen Edition
 
-**Free OpenCode Zen models only** · Automatic model updater · Quality improvements for offline Android arcade games
+**Free OpenCode Zen models only** · Automatic model updater · Quality improvements for Android game creation + improvements to agents.md for higher quality production / work.
 
 > Fork of [striderZA/OpenCodeGameStudios](https://github.com/striderZA/OpenCodeGameStudios) locked exclusively to free OpenCode Zen models.
 
